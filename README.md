@@ -1,4 +1,4 @@
-# RC Kit: ISC and IC
+# RC Kit: ISC rate constant
 
 This source distribution supports `SUB=5` (ISC). The CPU and GPU executables use the same Fortran sources. The GPU build additionally compiles `cuda_fastpath.cuf` and enables `USE_CUDA`.
 
