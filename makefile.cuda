@@ -1,0 +1,39 @@
+.DEFAULT_GOAL := all
+
+include sources.mk
+
+GPU_FC ?= nvfortran
+GPU_ARCH ?= cc70
+GPU_HOST_FLAGS ?= -O3 -Mpreprocess -DUSE_CUDA
+GPU_CUDA_FLAGS ?= -O3 -cuda -gpu=$(GPU_ARCH) -Mpreprocess -DUSE_CUDA
+GPU_FIXED_FLAGS ?= -O3 -Mpreprocess -DUSE_CUDA -Mextend
+GPU_LDFLAGS ?= -cuda -gpu=$(GPU_ARCH) -cudalib=cublas,cusolver -llapack -lblas
+GPU_BUILD := build/gpu
+GPU_TARGET := RC_Kit_GPU.exe
+GPU_OBJECTS := $(GPU_BUILD)/cuda_fastpath.o $(addprefix $(GPU_BUILD)/,$(F90_SOURCES:.f90=.o) $(FIXED_SOURCES:.for=.o))
+
+.PHONY: all clean
+
+all: $(GPU_TARGET)
+
+$(GPU_TARGET): $(GPU_OBJECTS)
+	$(GPU_FC) $(GPU_CUDA_FLAGS) $^ -o $@ $(GPU_LDFLAGS)
+
+$(GPU_BUILD):
+	mkdir -p $@
+
+$(GPU_BUILD)/cuda_fastpath.o: cuda_fastpath.cuf | $(GPU_BUILD)
+	$(GPU_FC) $(GPU_CUDA_FLAGS) -module $(GPU_BUILD) -I$(GPU_BUILD) -c $< -o $@
+
+$(GPU_BUILD)/%.o: %.f90 | $(GPU_BUILD)
+	$(GPU_FC) $(GPU_HOST_FLAGS) -module $(GPU_BUILD) -I$(GPU_BUILD) -c $< -o $@
+
+$(GPU_BUILD)/%.o: %.for | $(GPU_BUILD)
+	$(GPU_FC) $(GPU_FIXED_FLAGS) -module $(GPU_BUILD) -I$(GPU_BUILD) -c $< -o $@
+
+$(GPU_BUILD)/diag_mat.o: $(GPU_BUILD)/cuda_fastpath.o
+$(GPU_BUILD)/time_correlation_function_isc.o: $(GPU_BUILD)/cuda_fastpath.o $(GPU_BUILD)/mat_operation_and_integrator.o $(GPU_BUILD)/gaussian_function.o
+$(GPU_BUILD)/time_correlation_function_ic.o: $(GPU_BUILD)/cuda_fastpath.o $(GPU_BUILD)/mat_operation_and_integrator.o $(GPU_BUILD)/gaussian_function.o $(GPU_BUILD)/tc_buffer_io.o
+
+clean:
+	rm -f $(GPU_TARGET) $(GPU_BUILD)/*.o $(GPU_BUILD)/*.mod

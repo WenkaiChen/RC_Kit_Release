@@ -1,0 +1,177 @@
+This is the example file to tell you how to write input file.
+All what you need to do is revising the variables to fit your system.
+Energies as well as SPIN_ORBIT_COUPLING should be converted to atomic unit (hartree)
+NAC should be converted to atomic unit
+Temperature should be converted to unit 'K'
+DAMPING_WIDTH should be converted to unit 'cm-1'
+TIME_STEP should be converted to unit 'ps'
+
+
+For FORMULA, if SUB==5, ISC rate constant -- Time-dependent, spin-vibronic coupling.
+                               
+--------------------------------------------------------------------------------------------------------------------------------------------------------                      
+Values to set for ### Rate Constant Calculations ###:
+      ENERGY_1 is the minima energy of initial state (S1 for ISC processes while T1 for RISC processes). 
+      ENERGY_2 is the minima energy of final state (T1 for ISC processes while S1 for RISC processes). 
+      LAMBDA_SUR and LAMBDA_SUR2 is the value of SURROUDING REORGANIZATION ENERGY, usually we set this value to 0, unless you know what you are doing. 
+      ISC_SOC is the complex SPIN ORBIT COUPLING of inital state to final state. Use the format (real,imag).
+      SOC_DERIV_FILE is the string, the filename of dSOC/dR OR dSOC/dQ, useful if (USE_HT=.TRUE. and SUB==5/14). in Cartesian coordinates or in normal modes.
+      SOC_DERIV_MODE is a int, == 1 for dSOC/dR, (Cartesian coordinates). For USE_NASVC == .TRUE., SOC_DERIV_MODE must be set to 1.
+                               USEFUL FOR (SUB == 5 AND USE_HT=.TRUE.)
+      INIT_FILENAME is the .fchk file of inital state. 
+      FINAL_FILENAME is the .fchk file of final state. 
+      HESSIAN_FILE_1 is the initial hessian file name. 
+      HESSIAN_FILE_2 is the final hessian file name. 
+      NAC_FILE is the NAC file name.
+      NAC_MODE is a int, == 1 for NAC is in Cartesian coordinates,
+                         == 2 for NAC is in normal modes coordinates. (for SUB==12 or 13 or 15)
+      CAL_REO is .TRUE. if you want to calculate reorganization energy.
+                 .FALSE. if you already have the reorganization energy.
+      CRYSTAL is .TRUE. if your QC calculation is done in a crystal enviroment.
+                 .FALSE. if your QC calculation in vacuo or in PCM model.
+      INTEGRAL_STEPS is the steps of integration.
+      TIME_STEP is the time interval of the integration. (Unit: ps) 
+      USE_DAMPING_FUNCTION is the LOGICAL parameter 
+      DAMPING_WIDTH is a real number for Gaussian Damping Width with unit cm-1. 
+      USE_DUSCHINSKY is a logical variable, determing use Duschinsky matrix or not (always set it to .TRUE. plz)
+      USE_HT is a logical variable, determing include HT effects or not.
+      USE_NASVC is a logical variable, determing include NA-SVC effects or not in SUB==5 or 14.
+      SIMPLIFIED_SVC is a logical variable. TRUE means the simplified SVC formula in main2.tex;
+                     FALSE means the full SVC formula in main.tex.
+      NUM_STATES_SAME_SPIN_INIT is a int, determing the number of total states which has same spin with initial electronic state.
+      TARGET_INIT is a int, determing which is the target state. (e.g. NUM_STATES_SAME_SPIN_INIT=3 and 
+                                                                       TARGET_INIT=2 means 
+                                                                       S2 is the initial state in S1 S2 S3)
+      NUM_STATES_SAME_SPIN_FINAL is a int, determing the number of total states which has same spin with final electronic state.
+      TARGET_FINAL is a int, determing which is the target state. (e.g. NUM_STATES_SAME_SPIN_FINAL=3 and 
+                                                                        TARGET_FINAL=2 means
+                                                                        T2 is the final state in T1 T2 T3)
+      FN_NAC_SPIN_INIT is the file name of all NACs in a.u. between other same spin states with initial state.
+                          (e.g. target S2, total S1/S2/S3, this file recording NAC of S2/S1, S2/S3)
+      FN_NAC_SPIN_FINAL is the file name of all ANCs in a.u. between other same spin states with final state.
+                          (e.g. target T2, total T1/T2/T3, this file recording NAC of T2/T1, T2/T3)
+      FN_ENE_SPIN_INIT is the file name of all energies in a.u. between other same spin states with initial state.
+                          (e.g. target S2, total S1/S2/S3, energies in order: S1 S2 S3)
+      FN_ENE_SPIN_FINAL is the file name of all energies in a.u. between other same spin states with final state.
+                          (e.g. target T2, total T1/T2/T3, energies in order: T1 T2 T3)
+      FN_SOC_INIT_FINALS is the file name of all SOC in a.u. between other same spin states with initial state.
+                           (e.g. target S2, total T1/T2/T3 for the other spin, this file recording SOC of S2-T1, S2-T2, S2-T3)
+                           Each SOC should use the complex format (real,imag).
+      FN_SOC_FINAL_INITS is the file name of all SOC in a.u. between other same spin states with final state.
+                           (e.g. target T2, total S1/S2/S3 for the other spin, this file recording SOC of T2-S1, T2-S2, T2-S3)
+                           Each SOC should use the complex format (real,imag).
+      NUM_ZERO_HUANG_MODE is an int. It is the number/dimension of the array of ZERO_HUANG_FACTOR_MODES.  Plz don't change this key word. Not tested.
+      ZERO_HUANG_FACTOR_MODES is an array. Set it to -1 if you don't want to set any huang_rhys factor to zero. Plz don't change this key word. Not tested.
+
+
+====================================== VARIABLES FOR ALL CALCULATION ===================================
+&FORMULA
+SUB=5
+/
+========================================================================================================
+
+================================= VARIABLES FOR RATE CONSTANT CALCULATION ==============================
+&TEMPERATURE
+TEMP=300.0
+/
+
+&INIT_ENERGY
+ENERGY_1=0.000000000000E+00
+/
+
+&FINAL_ENERGY
+ENERGY_2=1.359724E-3
+/
+
+&SURROUDING_LAMBDA
+LAMBDA_SUR=0
+LAMBDA_SUR2=0
+/
+
+&CAL_REO_ENE_OR_NOT
+CAL_REO=.TRUE.
+/
+
+&SPIN_ORBIT_COUPLING
+ISC_SOC=(0.000000000000e+00, 1.325581000000e-08)
+/
+
+&NUMBER_OF_ATOMS
+N_ATOMS=140
+/
+
+&CRY
+CRYSTAL=.FALSE.
+/
+
+&INIT_FCHK_NAME
+INIT_FILENAME="t1_freq.fchk"
+/
+
+&FINAL_FCHK_NAME
+FINAL_FILENAME="s1_freq.fchk"
+/
+
+&HESSIAN_FILE
+HESSIAN_FILE_1="t1_freq.hess"
+HESSIAN_FILE_2="s1_freq.hess"
+/
+
+&NAC_FNAME
+NAC_FILE="NAC_1.TXT"
+NAC_MODE=1
+/
+
+&N_PROM_MODE ##### useless now #####
+N_PROMOTING_MODE=1 ##### useless now #####
+PROMOTING_MODE_FILE_NAME="promote_mode.txt" ##### useless now #####
+/
+
+&DAMPING
+USE_DAMPING_FUNCTION=.TRUE.
+DAMPING_WIDTH=10
+/
+
+&INTEGRAL_PARAMETERS
+INTEGRAL_STEPS=50000
+TIME_STEP=0.00001
+/
+
+&DUSCH
+USE_DUSCHINSKY=.TRUE. 
+/
+
+&SVC
+USE_HT=.TRUE.
+USE_NASVC=.TRUE.
+SIMPLIFIED_SVC=.FALSE.
+/
+
+&NASVC_PARAMS
+NUM_STATES_SAME_SPIN_INIT=4
+TARGET_INIT=1
+NUM_STATES_SAME_SPIN_FINAL=1
+TARGET_FINAL=1
+FN_NAC_SPIN_INIT="NAC_1.TXT"
+FN_NAC_SPIN_FINAL="NAC_2.TXT"
+FN_ENE_SPIN_INIT="ENE_1.TXT"
+FN_ENE_SPIN_FINAL="ENE_2.TXT"
+FN_SOC_INIT_FINALS="SOC_1.TXT"
+FN_SOC_FINAL_INITS="SOC_2.TXT"
+FN_SOC_DERIV_INIT_FINALS="SOC_Deriv_1.TXT"
+FN_SOC_DERIV_FINAL_INITS="SOC_Deriv_2.TXT"
+NAC_MODE_FOR_NASVC=1
+/
+
+&HTSVC_PARAMS
+FN_SOC_DERIV="SOC_Deriv.txt"
+SOC_DERIV_MODE=1
+/
+
+&ZERO_MODE_HUANG_RHYS ##### not tested, for debug only #####
+NUM_ZERO_HUANG_MODE=0
+ZERO_HUANG_FACTOR_MODES=1 2 3 4 5 
+/
+
+========================================================================================================
+

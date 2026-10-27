@@ -1,0 +1,34 @@
+.DEFAULT_GOAL := all
+
+include sources.mk
+
+CPU_FC ?= gfortran
+CPU_FLAGS ?= -O3 -cpp -ffree-line-length-none
+CPU_FIXED_FLAGS ?= -O3 -cpp -ffixed-line-length-none
+CPU_MODFLAGS ?= -J
+CPU_LDFLAGS ?= -llapack -lblas
+CPU_BUILD := build/cpu
+CPU_TARGET := RC_Kit_CPU.exe
+CPU_OBJECTS := $(addprefix $(CPU_BUILD)/,$(F90_SOURCES:.f90=.o) $(FIXED_SOURCES:.for=.o))
+
+.PHONY: all clean
+
+all: $(CPU_TARGET)
+
+$(CPU_TARGET): $(CPU_OBJECTS)
+	$(CPU_FC) $(CPU_FLAGS) $^ -o $@ $(CPU_LDFLAGS)
+
+$(CPU_BUILD):
+	mkdir -p $@
+
+$(CPU_BUILD)/%.o: %.f90 | $(CPU_BUILD)
+	$(CPU_FC) $(CPU_FLAGS) $(CPU_MODFLAGS)$(CPU_BUILD) -I$(CPU_BUILD) -c $< -o $@
+
+$(CPU_BUILD)/%.o: %.for | $(CPU_BUILD)
+	$(CPU_FC) $(CPU_FIXED_FLAGS) $(CPU_MODFLAGS)$(CPU_BUILD) -I$(CPU_BUILD) -c $< -o $@
+
+$(CPU_BUILD)/time_correlation_function_isc.o: $(CPU_BUILD)/mat_operation_and_integrator.o $(CPU_BUILD)/gaussian_function.o
+$(CPU_BUILD)/time_correlation_function_ic.o: $(CPU_BUILD)/mat_operation_and_integrator.o $(CPU_BUILD)/gaussian_function.o $(CPU_BUILD)/tc_buffer_io.o
+
+clean:
+	rm -f $(CPU_TARGET) $(CPU_BUILD)/*.o $(CPU_BUILD)/*.mod
